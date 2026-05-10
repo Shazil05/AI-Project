@@ -143,15 +143,14 @@ def apply_wh_templates(sentence: str) -> list:
     return candidates
 
 
-def rank_questions(candidates: list, article: str, svm_model) -> str:
+def rank_questions(candidates: list) -> str:
     if not candidates:
         return ""
     if len(candidates) == 1:
         return candidates[0]
 
-    # Simple fluency heuristic: prefer shorter, well-formed questions
     def score(q):
-        length_penalty = abs(len(q.split()) - 10)  # ideal ~10 words
+        length_penalty = abs(len(q.split()) - 10)
         starts_wh      = 1 if q.split()[0].lower() in {'who','what','where','when','why','how'} else 0
         return starts_wh * 10 - length_penalty
 
@@ -159,11 +158,11 @@ def rank_questions(candidates: list, article: str, svm_model) -> str:
 
 
 def generate_question(article: str, answer: str, vocab: dict, svm_model) -> str:
-    sentences  = extract_candidate_sentences(article, answer, vocab, top_k=5)
-    all_cands  = []
+    sentences = extract_candidate_sentences(article, answer, vocab, top_k=5)
+    all_cands = []
     for sent in sentences:
         all_cands.extend(apply_wh_templates(sent))
-    return rank_questions(all_cands, article, svm_model)
+    return rank_questions(all_cands)
 
 
 # ---------------------------------------------------------------------------
@@ -374,8 +373,9 @@ if __name__ == '__main__':
         print("Ensemble already trained — skipping.")
     else:
         print("Training stacking ensemble...")
+        X_verify_test, y_verify_test = joblib.load(PROC / 'X_verify_test.joblib')
         ensemble = train_stacking_ensemble([lr, svm], X_verify_val, y_verify_val,
-                                           X_verify_val)
+                                           X_verify_test)
         save_best_ensemble(ensemble)
 
     print("\nmodel_a_train.py complete.")
