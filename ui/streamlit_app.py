@@ -73,7 +73,8 @@ with tab1:
                     answer_text = str(row[row['answer']])
 
                     b = model_b_predict(article_txt, question, answer_text)
-                    opts = [answer_text] + b['distractors'][:3]
+                    clean_distractors = [d for d in b['distractors'] if d.strip().lower() != answer_text.strip().lower()]
+                    opts = [answer_text] + clean_distractors[:3]
                     while len(opts) < 4:
                         opts.append('None of the above')
                     random.shuffle(opts)
