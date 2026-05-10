@@ -10,6 +10,16 @@ from src.inference import load_all_models, run_full_pipeline, model_a_predict, m
 
 st.set_page_config(page_title="RACE Quiz System", page_icon="📖", layout="centered")
 
+# Sidebar
+with st.sidebar:
+    st.title("AI Project")
+    st.markdown("---")
+    # Using a spacer to push the authors to the bottom if possible, or just listing them
+    st.markdown("### Authors")
+    st.markdown("**Shazil Rehman** - 23i-0095")
+    st.markdown("**Abdul Mohaimin** - 23i-0652")
+
+
 @st.cache_resource
 def get_models():
     load_all_models()
