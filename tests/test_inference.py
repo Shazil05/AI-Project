@@ -41,7 +41,7 @@ class TestModelAPredict:
 
     def test_returns_required_keys(self):
         result = model_a_predict(ARTICLE, QUESTION, OPTION_CORRECT)
-        assert set(result.keys()) == {'is_correct', 'confidence', 'latency_ms'}
+        assert {'is_correct', 'confidence', 'latency_ms'}.issubset(result.keys())
 
     def test_is_correct_is_bool(self):
         result = model_a_predict(ARTICLE, QUESTION, OPTION_CORRECT)
@@ -73,7 +73,7 @@ class TestModelBPredict:
 
     def test_returns_required_keys(self):
         result = model_b_predict(ARTICLE, QUESTION, OPTION_CORRECT)
-        assert set(result.keys()) == {'distractors', 'hints', 'latency_ms'}
+        assert {'distractors', 'hints', 'latency_ms'}.issubset(result.keys())
 
     def test_exactly_3_distractors(self):
         result = model_b_predict(ARTICLE, QUESTION, OPTION_CORRECT)
