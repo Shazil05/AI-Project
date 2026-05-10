@@ -1,3 +1,4 @@
+import re
 import sys
 import time
 import random
@@ -112,9 +113,6 @@ def run_full_pipeline(article: str) -> dict:
     vocab     = _models['vocab']
     svm_model = _models['svm']
 
-    # Generate question and answer from article
-    # Use the first sentence's key noun phrase as a proxy answer for generation
-    import re
     sentences   = [s.strip() for s in re.split(r'[.!?]', article) if len(s.strip()) > 10]
     answer_text = sentences[0].split()[-1] if sentences else 'unknown'
 
@@ -125,16 +123,16 @@ def run_full_pipeline(article: str) -> dict:
     b    = model_b_predict(article, question, answer_text)
     t_b_ms = round((time.time() - t_b0) * 1000, 2)
 
-    distractors = b['distractors']
+    # Exclude any distractor that exactly matches the answer
+    distractors = [d for d in b['distractors'] if d.strip().lower() != answer_text.strip().lower()]
 
-    # Shuffle options so correct answer isn't always in same position
     options_list = [answer_text] + distractors[:3]
     while len(options_list) < 4:
-        options_list.append(f"None of the above")
+        options_list.append('None of the above')
 
     random.shuffle(options_list)
-    labels = ['A', 'B', 'C', 'D']
-    options = {labels[i]: options_list[i] for i in range(4)}
+    labels        = ['A', 'B', 'C', 'D']
+    options       = {labels[i]: options_list[i] for i in range(4)}
     correct_label = labels[options_list.index(answer_text)]
 
     return {
